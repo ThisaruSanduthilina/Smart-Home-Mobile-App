@@ -47,10 +47,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                  size: 20,
+                icon: Image.asset(
+                  'assets/images/RiseLogo.png',
+                  width: 20,
+                  height: 20,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.home_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    );
+                  },
                 ),
               ),
               Text(
@@ -66,10 +74,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   color: const Color(0xFF1C1C1E),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
-                  Icons.grid_view_rounded,
-                  color: Colors.white,
-                  size: 20,
+                child: Image.asset(
+                  'assets/images/RiseLogo.png',
+                  width: 20,
+                  height: 20,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.grid_view_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    );
+                  },
                 ),
               ),
             ],
@@ -173,6 +189,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       end: Alignment.bottomRight,
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
+                    backgroundImage: 'assets/images/living.jpg',
                   ),
                   _buildRoomCard(
                     context: context,
@@ -184,6 +201,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       end: Alignment.bottomRight,
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
+                    backgroundImage: 'assets/images/bedroom.webp',
                   ),
                   _buildRoomCard(
                     context: context,
@@ -195,6 +213,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       end: Alignment.bottomRight,
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
+                    backgroundImage: 'assets/images/kitchen.jpg',
                   ),
                 ],
               ),
@@ -243,17 +262,18 @@ class _HomeDashboardState extends State<HomeDashboard> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00CC66),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.home_rounded,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+                    Image.asset(
+                      'assets/images/RiseLogo.png',
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.home_rounded,
+                          color: Colors.white,
+                          size: 48,
+                        );
+                      },
                     ),
                     const SizedBox(width: 16),
                     const Text(
@@ -426,6 +446,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
                     isDesktop: true,
+                    backgroundImage: 'assets/images/living.jpg',
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -441,6 +462,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
                     isDesktop: true,
+                    backgroundImage: 'assets/images/bedroom.webp',
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -456,6 +478,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       colors: [Color(0xFF2D2D30), Color(0xFF1A1A1C)],
                     ),
                     isDesktop: true,
+                    backgroundImage: 'assets/images/kitchen.jpg',
                   ),
                 ),
               ],
@@ -475,11 +498,12 @@ class _HomeDashboardState extends State<HomeDashboard> {
     required IconData icon,
     required Gradient gradient,
     bool isDesktop = false,
+    String? backgroundImage,
   }) {
     return Padding(
       padding: isDesktop ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        height: isDesktop ? 400 : null,
+        height: isDesktop ? 320 : null,
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(30),
@@ -490,21 +514,54 @@ class _HomeDashboardState extends State<HomeDashboard> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.05),
-                    Colors.white.withValues(alpha: 0.02),
-                  ],
+          child: Stack(
+            children: [
+              // Background image
+              if (backgroundImage != null)
+                Positioned.fill(
+                  child: Image.asset(
+                    backgroundImage,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(gradient: gradient),
+                      );
+                    },
+                  ),
+                ),
+
+              // Dark overlay
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.5),
+                        Colors.black.withValues(alpha: 0.7),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              child: Column(
+
+              // Blur effect
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.05),
+                        Colors.white.withValues(alpha: 0.02),
+                      ],
+                    ),
+                  ),
+                  child: Column(
                 children: [
                   // Temperature/Status indicator
                   Align(
@@ -580,10 +637,10 @@ class _HomeDashboardState extends State<HomeDashboard> {
                       _buildAvatar(),
                       _buildAvatar(),
                       _buildAvatar(),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: const Color(0xFF00CC66),
                           shape: BoxShape.circle,
@@ -595,14 +652,16 @@ class _HomeDashboardState extends State<HomeDashboard> {
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,
-                          size: 18,
+                          size: 16,
                         ),
                       ),
                     ],
                   ),
                 ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -611,9 +670,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
 
   Widget _buildAvatar() {
     return Container(
-      width: 40,
-      height: 40,
-      margin: const EdgeInsets.only(right: 8),
+      width: 36,
+      height: 36,
+      margin: const EdgeInsets.only(right: 6),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.grey.shade800,
@@ -625,7 +684,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
       child: const Icon(
         Icons.person,
         color: Colors.white,
-        size: 20,
+        size: 18,
       ),
     );
   }

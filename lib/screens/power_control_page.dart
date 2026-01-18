@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../services/firebase_service.dart';
-import '../widgets/power_monitor_card.dart';
+import '../widgets/dual_power_monitor_card.dart';
 
 class PowerControlPage extends StatefulWidget {
   const PowerControlPage({super.key});
@@ -11,6 +12,26 @@ class PowerControlPage extends StatefulWidget {
 
 class _PowerControlPageState extends State<PowerControlPage> {
   final FirebaseService _firebaseService = FirebaseService();
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set up automatic refresh every 10 seconds
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        setState(() {
+          // Trigger rebuild to fetch latest data from Firebase stream
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +75,14 @@ class _PowerControlPageState extends State<PowerControlPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Real-Time Power Monitoring',
+                'Electricity Meter Monitoring',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Monitor electrical consumption and detect power outages',
+                'Real-time CEB grid power consumption - Updates every 10 seconds',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -87,16 +108,45 @@ class _PowerControlPageState extends State<PowerControlPage> {
                       ),
                     );
                   }
-                  return PowerMonitorCard(powerMonitor: snapshot.data!);
+
+                  final powerData = snapshot.data!;
+                  // Use actual CEB grid readings from Firebase
+                  final cebCurrent = powerData.currentAmps;
+                  final cebPrevious = powerData.previousAmps;
+
+                  // Convert historical data to list format for the widget
+                  final historicalDataList = powerData.historicalData.map((reading) {
+                    return {
+                      'timestamp': reading.timestamp,
+                      'amps': reading.amps,
+                      'voltage': reading.voltage,
+                      'watts': reading.watts,
+                    };
+                  }).toList();
+
+                  return DualPowerMonitorCard(
+                    cebCurrentAmps: cebCurrent,
+                    cebPreviousAmps: cebPrevious,
+                    solarCurrentAmps: 0.0, // Not using solar
+                    solarPreviousAmps: 0.0, // Not using solar
+                    lastUpdated: powerData.lastUpdatedTime,
+                    hasCebOutage: cebCurrent < 0.001,
+                    hasSolarOutage: true, // Hide solar card
+                    historicalData: historicalDataList,
+                    voltage: powerData.voltage,
+                    powerWatts: powerData.powerWatts,
+                    energyKwh: powerData.energyKwh,
+                  );
                 },
               ),
               const SizedBox(height: 24),
               _buildInfoCard(
                 context,
-                'About Power Monitoring',
-                'This system monitors real-time electrical current consumption. '
-                'When the current drops below 0.001A, a power outage alert is triggered. '
-                'The chart shows historical trends to help you understand usage patterns.',
+                'About CEB Grid Power Monitoring',
+                'This system monitors CEB grid electricity consumption in real-time using a current transformer (CT) sensor. '
+                'Data is updated every 10 seconds from Firebase and displayed in the graph showing usage over time. '
+                'Monitor current (Amperes), voltage (Volts), power consumption (Watts), and total energy used (kWh). '
+                'The graph shows your actual electricity usage from the CEB grid connection.',
                 Icons.info_outline,
               ),
             ],

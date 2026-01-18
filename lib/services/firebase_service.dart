@@ -58,7 +58,7 @@ class FirebaseService {
     await _database.child('curtain/value').set(position);
   }
 
-  // Power Monitor
+  // Power Monitor - CEB Grid Electricity Meter
   Stream<PowerMonitorModel> getPowerMonitorStream() {
     return _database.child('ct_monitor').onValue.map((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>?;
@@ -67,10 +67,31 @@ class FirebaseService {
           currentAmps: 0,
           lastUpdated: 0,
           previousAmps: 0,
+          voltage: 230.0,
+          powerWatts: 0.0,
+          energyKwh: 0.0,
         );
       }
-      return PowerMonitorModel.fromJson(Map<String, dynamic>.from(data));
+
+      // Convert the data to proper format
+      final currentAmps = (data['current_amps'] ?? 0).toDouble();
+      final voltage = 230.0; // Standard CEB voltage
+
+      return PowerMonitorModel(
+        currentAmps: currentAmps,
+        lastUpdated: data['last_updated'] ?? 0,
+        previousAmps: (data['previous_amps'] ?? 0).toDouble(),
+        voltage: voltage,
+        powerWatts: currentAmps * voltage, // Calculate power
+        energyKwh: 0.0, // Can be calculated if needed
+        historicalData: [], // Will be added when you implement history in database
+      );
     });
+  }
+
+  // Get CEB Grid Power reading - same as above for now
+  Stream<PowerMonitorModel> getCEBPowerStream() {
+    return getPowerMonitorStream();
   }
 
   // Get all data for dashboard
