@@ -99,9 +99,9 @@ class _LightControlPageState extends State<LightControlPage> {
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 1.1,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          childAspectRatio: 2.5,
                         ),
                         itemCount: ledKeys.length,
                         itemBuilder: (context, index) {

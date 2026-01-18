@@ -3,6 +3,7 @@ import 'home_dashboard.dart';
 import 'control_center_page.dart';
 import 'settings_page.dart';
 import 'rooms_page.dart';
+import 'chatbot/components/chatbot_fab.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -24,7 +25,12 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: Stack(
+        children: [
+          _pages[_currentIndex],
+          const ChatbotFab(),
+        ],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1C1C1E),
